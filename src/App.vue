@@ -1,10 +1,12 @@
 <template></template>
 <script setup>
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // 创建场景
 const scene = new THREE.Scene();
 // 创建相机
 const camera = new THREE.PerspectiveCamera();
+//透视相机如果不调整位置是和模型重叠在一起的，可以在编辑器中看到
 camera.position.z = 15;
 camera.position.y = 5;
 
@@ -15,7 +17,7 @@ const material = new THREE.MeshBasicMaterial({
 });
 //网格
 const cube = new THREE.Mesh(geometry, material);
-cube.position.y = 10;
+cube.position.y = 5;
 scene.add(cube);
 //网格地面
 const gridHelper = new THREE.GridHelper(10, 10);
@@ -25,9 +27,26 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 //将渲染器添加到页面
 document.body.appendChild(renderer.domElement);
+
+//允许用户使用鼠标来旋转、缩放和移动视角，以便更好地查看 3D 场景。轨道控制器
+const controls = new OrbitControls(camera, renderer.domElement);
+//在对相机的变换进行任何手动更改后，必须调用controls .update()
+//对当相机被控件改变时触发（鼠标按住界面移动）
+controls.addEventListener("change", () => {
+    console.log("Camera position changed.");
+});
+//阻尼（拖动过后画面有一个惯性移动效果）必须在动画循环中调用.update ()。
+controls.enableDamping = true;
+//启用或禁用相机的水平和垂直旋转。默认为 true。
+// controls.enableRotate = false;
+//自动旋转
+controls.autoRotate = true;
+
 //创建循环
 function animate() {
     requestAnimationFrame(animate);
+    //在对相机的变换进行任何手动更改后，必须调用controls .update()
+    controls.update();
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
     renderer.render(scene, camera);
