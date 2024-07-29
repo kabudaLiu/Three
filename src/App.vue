@@ -40,24 +40,60 @@ const scene = new THREE.Scene();
 //纹理贴图
 // const loader = new THREE.CubeTextureLoader();
 // loader.setPath("/");
-// scene.background = loader.load(["3.jpeg", "3.jpeg", "3.jpeg", "3.jpeg", "3.jpeg", "3.jpeg"]);
+// const cubeTexture = loader.load(["3.jpeg", "4.jpeg", "5.jpg", "6.jpeg", "7.jpeg", "8.jpeg"]);
+
+// scene.background = cubeTexture;
+// scene.background = new THREE.TextureLoader().load("/3.jpeg");
 //雾
-scene.fog = new THREE.Fog(0xcccccc, 10, 15);
+// scene.fog = new THREE.Fog(0xcccccc, 10, 15);
 // 创建相机
 const camera = new THREE.PerspectiveCamera();
 //透视相机如果不调整位置是和模型重叠在一起的，可以在编辑器中看到
 camera.position.z = 15;
 camera.position.y = 5;
 
+// const texture = new THREE.TextureLoader().load("/3.jpeg");
 //创建立方体
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({
-    color: 0x00ff00,
-});
+const geometry = new THREE.PlaneGeometry(1, 1);
+const texture = new THREE.TextureLoader().load("/1.png");
+
+// const geometry = new THREE.BufferGeometry(1, 1);
+// const vertices = new Float32Array([
+//     -1.0,
+//     -1.0,
+//     1.0, // v0
+//     1.0,
+//     -1.0,
+//     1.0, // v1
+//     1.0,
+//     1.0,
+//     1.0, // v2
+
+//     -1.0,
+//     1.0,
+//     1.0, // v4       有两组数据是重复的
+// ]);
+// const indices = [0, 1, 2, 2, 3, 0];
+// geometry.setIndex(indices);
+// // itemSize = 3 因为每个顶点时三个值 v0-5
+// geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+
+// const material = new THREE.MeshBasicMaterial({ map: texture });
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+//左上 右上 左下 右下 必须严格遵守
+// const uv = new Float32Array([0, 0.5, 0.5, 0.5, 0, 0, 0.5, 0]);
+// geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+console.log(geometry);
+
+// const geometry = new THREE.PlaneGeometry(1, 1);
+// const material = new THREE.MeshBasicMaterial({
+//     // envMap: cubeTexture,
+//     // side: THREE.DoubleSide,
+// });
 //网格
 const cube = new THREE.Mesh(geometry, material);
-cube.position.y = 2;
-cube.position.x = 2;
+// cube.position.y = 2;
+// cube.position.x = 2;
 
 scene.add(cube);
 //网格地面
@@ -101,17 +137,17 @@ onMounted(() => {
     // controls.autoRotate = true;
 
     //坐标轴
-    // const axesHelper = new THREE.AxesHelper(10);
-    // axesHelper.position.y=5
-    // scene.add(axesHelper);
+    const axesHelper = new THREE.AxesHelper(10);
+    axesHelper.position.y = 0;
+    scene.add(axesHelper);
 
     //创建循环
     function animate() {
         requestAnimationFrame(animate);
         //在对相机的变换进行任何手动更改后，必须调用controls .update()
         // controls.update();
-        cube.rotation.x += controlData.rotationSpeed;
-        cube.rotation.y += controlData.rotationSpeed;
+        // cube.rotation.x += controlData.rotationSpeed;
+        // cube.rotation.y += controlData.rotationSpeed;
         renderer.render(scene, camera);
     }
     animate();
