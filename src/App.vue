@@ -17,25 +17,25 @@ const controlData = {
     envMap: false,
 };
 //创建实例
-const gui = new dat.GUI();
-const f = gui.addFolder("配置");
-f.add(controlData, "rotationSpeed", 0, 0.1);
-//颜色选择器
-f.addColor(controlData, "color").onChange((value) => {
-    cube.material.color = new THREE.Color(value);
-});
-//下拉列表
-f.add(controlData, "envMap", ["无", "全反射", "漫反射"]);
-//选择框
-f.add(controlData, "wireframe").onChange((value) => {
-    cube.material.wireframe = value;
-});
-//否则每次刷新页面都会增加一个gui窗口，需要将它添加到dom中
-f.domElement.id = "gui";
-f.open();
+// const gui = new dat.GUI();
+// const f = gui.addFolder("配置");
+// f.add(controlData, "rotationSpeed", 0, 0.1);
+// //颜色选择器
+// f.addColor(controlData, "color").onChange((value) => {
+//     cube.material.color = new THREE.Color(value);
+// });
+// //下拉列表
+// f.add(controlData, "envMap", ["无", "全反射", "漫反射"]);
+// //选择框
+// f.add(controlData, "wireframe").onChange((value) => {
+//     cube.material.wireframe = value;
+// });
+// //否则每次刷新页面都会增加一个gui窗口，需要将它添加到dom中
+// f.domElement.id = "gui";
+// f.open();
 
 // 创建场景
-const scene = new THREE.Scene();
+// const scene = new THREE.Scene();
 // scene.background = new THREE.Color("red");
 //纹理贴图
 // const loader = new THREE.CubeTextureLoader();
@@ -47,15 +47,15 @@ const scene = new THREE.Scene();
 //雾
 // scene.fog = new THREE.Fog(0xcccccc, 10, 15);
 // 创建相机
-const camera = new THREE.PerspectiveCamera();
+// const camera = new THREE.PerspectiveCamera();
 //透视相机如果不调整位置是和模型重叠在一起的，可以在编辑器中看到
-camera.position.z = 15;
-camera.position.y = 5;
+// camera.position.z = 15;
+// camera.position.y = 5;
 
 // const texture = new THREE.TextureLoader().load("/3.jpeg");
 //创建立方体
-const geometry = new THREE.PlaneGeometry(1, 1);
-const texture = new THREE.TextureLoader().load("/1.png");
+// const geometry = new THREE.PlaneGeometry(1, 1);
+// const texture = new THREE.TextureLoader().load("/1.png");
 
 // const geometry = new THREE.BufferGeometry(1, 1);
 // const vertices = new Float32Array([
@@ -79,11 +79,10 @@ const texture = new THREE.TextureLoader().load("/1.png");
 // geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
 
 // const material = new THREE.MeshBasicMaterial({ map: texture });
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+// const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 //左上 右上 左下 右下 必须严格遵守
 // const uv = new Float32Array([0, 0.5, 0.5, 0.5, 0, 0, 0.5, 0]);
 // geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-console.log(geometry);
 
 // const geometry = new THREE.PlaneGeometry(1, 1);
 // const material = new THREE.MeshBasicMaterial({
@@ -91,34 +90,69 @@ console.log(geometry);
 //     // side: THREE.DoubleSide,
 // });
 //网格
-const cube = new THREE.Mesh(geometry, material);
+// const cube = new THREE.Mesh(geometry, material);
 // cube.position.y = 2;
 // cube.position.x = 2;
 
+// scene.add(cube);
+// //网格地面
+// const gridHelper = new THREE.GridHelper(10, 10);
+// scene.add(gridHelper);
+// //移动相机
+// const moveCamera = () => {
+//     camera.position.y = 10;
+//     camera.position.x = 10;
+//     camera.lookAt(2, 2, 0);
+// };
+// //移动物体
+// const moveObject = () => {
+//     cube.position.x = 5;
+//     cube.position.y = 5;
+//     camera.lookAt(cube.position);
+// };
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x666666);
+const camera = new THREE.PerspectiveCamera();
+camera.position.z = 5;
+camera.position.y = 5;
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshPhongMaterial({ color: 0x0099ff, shininess: 1000 });
+const cube = new THREE.Mesh(geometry, material);
+//物体投射光源
+cube.castShadow = true;
 scene.add(cube);
-//网格地面
-const gridHelper = new THREE.GridHelper(10, 10);
-scene.add(gridHelper);
-//移动相机
-const moveCamera = () => {
-    camera.position.y = 10;
-    camera.position.x = 10;
-    camera.lookAt(2, 2, 0);
-};
-//移动物体
-const moveObject = () => {
-    cube.position.x = 5;
-    cube.position.y = 5;
-    camera.lookAt(cube.position);
-};
+
+//添加环境光
+const ambientLight = new THREE.AmbientLight(0x444444, 1);
+scene.add(ambientLight);
+//添加点光源
+const light = new THREE.PointLight(0xffffff, 100);
+light.position.set(5, 3, 5);
+light.castShadow = true;
+
+scene.add(light);
+
+//创建地面
+const geometryPlan = new THREE.PlaneGeometry(10, 10);
+const materialPlan = new THREE.MeshPhongMaterial({ color: 0x1b5e20, side: THREE.DoubleSide });
+const cubePlan = new THREE.Mesh(geometryPlan, materialPlan);
+cubePlan.position.y = -0.5;
+cubePlan.rotation.x = Math.PI / 2;
+cubePlan.receiveShadow = true;
+scene.add(cubePlan);
 
 onMounted(() => {
     //创建渲染器
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight - 100);
+    renderer.shadowMap.enabled = true;
     //将渲染器添加到页面
     // document.body.appendChild(renderer.domElement);
-    document.getElementById("main").appendChild(f.domElement);
+    // document.getElementById("main").appendChild(f.domElement);
 
     document.getElementById("main").appendChild(renderer.domElement);
 
@@ -137,9 +171,9 @@ onMounted(() => {
     // controls.autoRotate = true;
 
     //坐标轴
-    const axesHelper = new THREE.AxesHelper(10);
-    axesHelper.position.y = 0;
-    scene.add(axesHelper);
+    // const axesHelper = new THREE.AxesHelper(10);
+    // axesHelper.position.y = 0;
+    // scene.add(axesHelper);
 
     //创建循环
     function animate() {
