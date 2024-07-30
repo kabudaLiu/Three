@@ -111,45 +111,62 @@ const controlData = {
 //     camera.lookAt(cube.position);
 // };
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x666666);
+// const scene = new THREE.Scene();
+// scene.background = new THREE.Color(0x666666);
 const camera = new THREE.PerspectiveCamera();
 camera.position.z = 5;
 camera.position.y = 5;
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
 
+// const geometry = new THREE.BoxGeometry(1, 1, 1);
+// const material = new THREE.MeshBasicMaterial({ color: 0x0099ff, shininess: 1000 });
+// const cube = new THREE.Mesh(geometry, material);
+// //物体投射光源
+// cube.castShadow = true;
+// scene.add(cube);
+
+// //添加环境光
+// const ambientLight = new THREE.AmbientLight(0x444444, 1);
+// // scene.add(ambientLight);
+// //添加点光源
+// const light = new THREE.PointLight(0xffffff, 100);
+// light.position.set(5, 3, 5);
+// light.castShadow = true;
+
+// // scene.add(light);
+
+// //创建地面
+// const geometryPlan = new THREE.PlaneGeometry(10, 10);
+// const materialPlan = new THREE.MeshPhongMaterial({ color: 0x1b5e20, side: THREE.DoubleSide });
+// const cubePlan = new THREE.Mesh(geometryPlan, materialPlan);
+// cubePlan.position.y = -0.5;
+// cubePlan.rotation.x = Math.PI / 2;
+// cubePlan.receiveShadow = true;
+// scene.add(cubePlan);
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshPhongMaterial({ color: 0x0099ff, shininess: 1000 });
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
-//物体投射光源
-cube.castShadow = true;
+const scene = new THREE.Scene();
 scene.add(cube);
 
-//添加环境光
-const ambientLight = new THREE.AmbientLight(0x444444, 1);
-scene.add(ambientLight);
-//添加点光源
-const light = new THREE.PointLight(0xffffff, 100);
-light.position.set(5, 3, 5);
-light.castShadow = true;
+//创建一个三维向量
+const vector = new THREE.Vector3(1, 1, 1);
 
-scene.add(light);
-
-//创建地面
-const geometryPlan = new THREE.PlaneGeometry(10, 10);
-const materialPlan = new THREE.MeshPhongMaterial({ color: 0x1b5e20, side: THREE.DoubleSide });
-const cubePlan = new THREE.Mesh(geometryPlan, materialPlan);
-cubePlan.position.y = -0.5;
-cubePlan.rotation.x = Math.PI / 2;
-cubePlan.receiveShadow = true;
-scene.add(cubePlan);
+//将物体的位置设置为该向量
+cube.position.copy(vector);
+// cube.position.set(1, 1, 2);
+// cube.position.x = -0.5;
+// cube.position.add(vector);//位置变为vector
+cube.translateX;
+cube.position.addScalar(2); //x/y/z各加2
+// cube.scale.set(1, 3, 4);//缩放
+// cube.visible = false;//显示
+console.log(cube);
 
 onMounted(() => {
     //创建渲染器
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight - 100);
-    renderer.shadowMap.enabled = true;
+    // renderer.shadowMap.enabled = true;
     //将渲染器添加到页面
     // document.body.appendChild(renderer.domElement);
     // document.getElementById("main").appendChild(f.domElement);
@@ -171,9 +188,9 @@ onMounted(() => {
     // controls.autoRotate = true;
 
     //坐标轴
-    // const axesHelper = new THREE.AxesHelper(10);
-    // axesHelper.position.y = 0;
-    // scene.add(axesHelper);
+    const axesHelper = new THREE.AxesHelper(10);
+    axesHelper.position.y = 0;
+    scene.add(axesHelper);
 
     //创建循环
     function animate() {
