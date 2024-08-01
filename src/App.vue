@@ -1,6 +1,4 @@
 <template>
-    <button @click="moveCamera">移动相机</button>
-    <button @click="moveObject">移动物体</button>
     <div id="main"></div>
 </template>
 <script setup>
@@ -8,195 +6,158 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { onMounted } from "vue";
 import * as dat from "dat.gui";
-//dat.gui
-//创建控制对象
-const controlData = {
-    rotationSpeed: 0.01,
-    color: "#FF0000", // 注意color的初始值，否则会报错
-    wireframe: false,
-    envMap: false,
-};
-//创建实例
-// const gui = new dat.GUI();
-// const f = gui.addFolder("配置");
-// f.add(controlData, "rotationSpeed", 0, 0.1);
-// //颜色选择器
-// f.addColor(controlData, "color").onChange((value) => {
-//     cube.material.color = new THREE.Color(value);
-// });
-// //下拉列表
-// f.add(controlData, "envMap", ["无", "全反射", "漫反射"]);
-// //选择框
-// f.add(controlData, "wireframe").onChange((value) => {
-//     cube.material.wireframe = value;
-// });
-// //否则每次刷新页面都会增加一个gui窗口，需要将它添加到dom中
-// f.domElement.id = "gui";
-// f.open();
 
 // 创建场景
-// const scene = new THREE.Scene();
-// scene.background = new THREE.Color("red");
-//纹理贴图
-// const loader = new THREE.CubeTextureLoader();
-// loader.setPath("/");
-// const cubeTexture = loader.load(["3.jpeg", "4.jpeg", "5.jpg", "6.jpeg", "7.jpeg", "8.jpeg"]);
-
-// scene.background = cubeTexture;
-// scene.background = new THREE.TextureLoader().load("/3.jpeg");
-//雾
-// scene.fog = new THREE.Fog(0xcccccc, 10, 15);
-// 创建相机
-// const camera = new THREE.PerspectiveCamera();
-//透视相机如果不调整位置是和模型重叠在一起的，可以在编辑器中看到
-// camera.position.z = 15;
-// camera.position.y = 5;
-
-// const texture = new THREE.TextureLoader().load("/3.jpeg");
-//创建立方体
-// const geometry = new THREE.PlaneGeometry(1, 1);
-// const texture = new THREE.TextureLoader().load("/1.png");
-
-// const geometry = new THREE.BufferGeometry(1, 1);
-// const vertices = new Float32Array([
-//     -1.0,
-//     -1.0,
-//     1.0, // v0
-//     1.0,
-//     -1.0,
-//     1.0, // v1
-//     1.0,
-//     1.0,
-//     1.0, // v2
-
-//     -1.0,
-//     1.0,
-//     1.0, // v4       有两组数据是重复的
-// ]);
-// const indices = [0, 1, 2, 2, 3, 0];
-// geometry.setIndex(indices);
-// // itemSize = 3 因为每个顶点时三个值 v0-5
-// geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
-
-// const material = new THREE.MeshBasicMaterial({ map: texture });
-// const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-//左上 右上 左下 右下 必须严格遵守
-// const uv = new Float32Array([0, 0.5, 0.5, 0.5, 0, 0, 0.5, 0]);
-// geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-
-// const geometry = new THREE.PlaneGeometry(1, 1);
-// const material = new THREE.MeshBasicMaterial({
-//     // envMap: cubeTexture,
-//     // side: THREE.DoubleSide,
-// });
-//网格
-// const cube = new THREE.Mesh(geometry, material);
-// cube.position.y = 2;
-// cube.position.x = 2;
-
-// scene.add(cube);
-// //网格地面
-// const gridHelper = new THREE.GridHelper(10, 10);
-// scene.add(gridHelper);
-// //移动相机
-// const moveCamera = () => {
-//     camera.position.y = 10;
-//     camera.position.x = 10;
-//     camera.lookAt(2, 2, 0);
-// };
-// //移动物体
-// const moveObject = () => {
-//     cube.position.x = 5;
-//     cube.position.y = 5;
-//     camera.lookAt(cube.position);
-// };
-
-// const scene = new THREE.Scene();
-// scene.background = new THREE.Color(0x666666);
-const camera = new THREE.PerspectiveCamera();
-camera.position.z = 5;
-camera.position.y = 5;
-
-// const geometry = new THREE.BoxGeometry(1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({ color: 0x0099ff, shininess: 1000 });
-// const cube = new THREE.Mesh(geometry, material);
-// //物体投射光源
-// cube.castShadow = true;
-// scene.add(cube);
-
-// //添加环境光
-// const ambientLight = new THREE.AmbientLight(0x444444, 1);
-// // scene.add(ambientLight);
-// //添加点光源
-// const light = new THREE.PointLight(0xffffff, 100);
-// light.position.set(5, 3, 5);
-// light.castShadow = true;
-
-// // scene.add(light);
-
-// //创建地面
-// const geometryPlan = new THREE.PlaneGeometry(10, 10);
-// const materialPlan = new THREE.MeshPhongMaterial({ color: 0x1b5e20, side: THREE.DoubleSide });
-// const cubePlan = new THREE.Mesh(geometryPlan, materialPlan);
-// cubePlan.position.y = -0.5;
-// cubePlan.rotation.x = Math.PI / 2;
-// cubePlan.receiveShadow = true;
-// scene.add(cubePlan);
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
 const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xcccccc, 1, 3000);
+//创建盒子
+const geometry = new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 1000);
+// 纹理贴图
+const texture = new THREE.TextureLoader().load("sky.png");
+const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+});
+const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-//创建一个三维向量
-const vector = new THREE.Vector3(1, 1, 1);
+//地球
+const earthTexture = new THREE.TextureLoader().load("earth_bg.png");
+const earthMaterial = new THREE.MeshPhongMaterial({ map: earthTexture });
+const earthGeometry = new THREE.SphereGeometry(20, 32, 32);
+const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+earth.position.set(-100, 0, -200);
+scene.add(earth);
+//灯光
+const light = new THREE.PointLight(0xffffff, 10000, 10000);
+light.position.set(-60, -1, -150);
+scene.add(light);
+// scene.add(new THREE.PointLightHelper(light, 20));
+//平行光
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+scene.add(directionalLight);
 
-//将物体的位置设置为该向量
-cube.position.copy(vector);
-// cube.position.set(1, 1, 2);
-// cube.position.x = -0.5;
-// cube.position.add(vector);//位置变为vector
-cube.translateX;
-cube.position.addScalar(2); //x/y/z各加2
-// cube.scale.set(1, 3, 4);//缩放
-// cube.visible = false;//显示
-console.log(cube);
+//相机
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 10;
+camera.lookAt(0, 0, 0);
+
+//星星
+const yungeometry = new THREE.BufferGeometry();
+const yun2geometry = new THREE.BufferGeometry();
+
+const vertices = [];
+const vertices2 = [];
+
+// 创建随机点
+for (let i = 0; i < 1500; i++) {
+    const x = -window.innerWidth / 2 + window.innerWidth * Math.random();
+    const y = -window.innerHeight / 2 + window.innerHeight * Math.random();
+    const z = Math.random() * -1000;
+
+    vertices.push(x, y, z);
+}
+for (let i = 0; i < 1500; i++) {
+    const x = -window.innerWidth / 2 + window.innerWidth * Math.random();
+    const y = -window.innerHeight / 2 + window.innerHeight * Math.random();
+    const z = Math.random() * -1000;
+
+    vertices2.push(x, y, z);
+}
+// 将点添加到几何体中
+yungeometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+yun2geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices2, 3));
+const starflake1 = new THREE.TextureLoader().load("starflake1.png");
+const starflake2 = new THREE.TextureLoader().load("starflake2.png");
+
+// 创建材质
+const yunmaterial = new THREE.PointsMaterial({
+    map: starflake1,
+    size: 5,
+    // blending: THREE.AdditiveBlending,
+    transparent: true,
+});
+const yunmaterial2 = new THREE.PointsMaterial({
+    map: starflake2,
+    color: 0x7df9ff,
+    size: 5,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+});
+
+// 创建点星
+const points = new THREE.Points(yungeometry, yunmaterial);
+const points2 = new THREE.Points(yun2geometry, yunmaterial2);
+
+scene.add(points);
+scene.add(points2);
+//创建云朵
+const cloudTexture = new THREE.TextureLoader().load("cloud.png");
+const cloudMaterial = new THREE.MeshBasicMaterial({
+    map: cloudTexture,
+    side: THREE.DoubleSide,
+    transparent: true,
+});
+const cloudGeometry = new THREE.PlaneGeometry(10, 10, 10);
+const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+
+scene.add(cloud);
+const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(-10, 0, -50), new THREE.Vector3(-5, 5, -40), new THREE.Vector3(-5, 10, -30), new THREE.Vector3(-5, 5, 0), new THREE.Vector3(10, 0, 10)]);
+
+const points3 = curve.getPoints(50);
+const geometry3 = new THREE.BufferGeometry().setFromPoints(points3);
+
+const material3 = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+const curveObject = new THREE.Line(geometry3, material3);
+// scene.add(curveObject);
 
 onMounted(() => {
     //创建渲染器
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight - 100);
-    // renderer.shadowMap.enabled = true;
-    //将渲染器添加到页面
-    // document.body.appendChild(renderer.domElement);
-    // document.getElementById("main").appendChild(f.domElement);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.getElementById("main").appendChild(renderer.domElement);
 
     //允许用户使用鼠标来旋转、缩放和移动视角，以便更好地查看 3D 场景。轨道控制器
     const controls = new OrbitControls(camera, renderer.domElement);
-    //在对相机的变换进行任何手动更改后，必须调用controls .update()
-    //对当相机被控件改变时触发（鼠标按住界面移动）
-    // controls.addEventListener("change", () => {
-    // console.log("Camera position changed.");
-    // });
-    //阻尼（拖动过后画面有一个惯性移动效果）必须在动画循环中调用.update ()。
-    // controls.enableDamping = true;
-    //启用或禁用相机的水平和垂直旋转。默认为 true。
-    // controls.enableRotate = false;
-    //自动旋转
-    // controls.autoRotate = true;
-
     //坐标轴
     const axesHelper = new THREE.AxesHelper(10);
     axesHelper.position.y = 0;
-    scene.add(axesHelper);
+    // scene.add(axesHelper);
+    // setInterval(() => {
+    //     // if (points.position.z > resetPositionZ) {
+    //     points.position.z = -50;
+    //     // }
+    // }, 7000);
+    setInterval(() => {
+        if (points.position.z > 400) {
+            points.position.z = -600;
+        }
+    }, 5000);
+    setInterval(() => {
+        if (points2.position.z > 400) {
+            points2.position.z = -500;
+        }
+    }, 7000);
 
+    // 动画变量
+    let t = 0;
     //创建循环
     function animate() {
         requestAnimationFrame(animate);
         //在对相机的变换进行任何手动更改后，必须调用controls .update()
-        // controls.update();
+        controls.update();
+        earth.rotation.y += 0.01;
+        points.position.z += 1;
+        points2.position.z += 1;
+        // 更新物体沿曲线的位置
+        t += 0.01;
+        if (t > 1) t = 0; // 循环
+
+        const position = curve.getPointAt(t);
+        cloud.position.copy(position);
+
         // cube.rotation.x += controlData.rotationSpeed;
         // cube.rotation.y += controlData.rotationSpeed;
         renderer.render(scene, camera);
