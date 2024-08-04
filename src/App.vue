@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { onMounted } from "vue";
 import * as dat from "dat.gui";
-
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 // 创建场景
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0xcccccc, 1, 3000);
@@ -19,7 +19,7 @@ const material = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide,
 });
 const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// scene.add(cube);
 
 //地球
 const earthTexture = new THREE.TextureLoader().load("earth_bg.png");
@@ -27,15 +27,15 @@ const earthMaterial = new THREE.MeshPhongMaterial({ map: earthTexture });
 const earthGeometry = new THREE.SphereGeometry(20, 32, 32);
 const earth = new THREE.Mesh(earthGeometry, earthMaterial);
 earth.position.set(-100, 0, -200);
-scene.add(earth);
+//scene.add(earth);
 //灯光
 const light = new THREE.PointLight(0xffffff, 10000, 10000);
 light.position.set(-60, -1, -150);
-scene.add(light);
-// scene.add(new THREE.PointLightHelper(light, 20));
+//scene.add(light);
+// //scene.add(new THREE.PointLightHelper(light, 20));
 //平行光
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-scene.add(directionalLight);
+//scene.add(directionalLight);
 
 //相机
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -89,8 +89,8 @@ const yunmaterial2 = new THREE.PointsMaterial({
 const points = new THREE.Points(yungeometry, yunmaterial);
 const points2 = new THREE.Points(yun2geometry, yunmaterial2);
 
-scene.add(points);
-scene.add(points2);
+//scene.add(points);
+//scene.add(points2);
 //创建云朵
 const cloudTexture = new THREE.TextureLoader().load("cloud.png");
 const cloudMaterial = new THREE.MeshBasicMaterial({
@@ -101,7 +101,7 @@ const cloudMaterial = new THREE.MeshBasicMaterial({
 const cloudGeometry = new THREE.PlaneGeometry(10, 10, 10);
 const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
 
-scene.add(cloud);
+//scene.add(cloud);
 const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(-10, 0, -50), new THREE.Vector3(-5, 5, -40), new THREE.Vector3(-5, 10, -30), new THREE.Vector3(-5, 5, 0), new THREE.Vector3(10, 0, 10)]);
 
 const points3 = curve.getPoints(50);
@@ -110,13 +110,59 @@ const geometry3 = new THREE.BufferGeometry().setFromPoints(points3);
 const material3 = new THREE.LineBasicMaterial({ color: 0xff0000 });
 
 const curveObject = new THREE.Line(geometry3, material3);
-// scene.add(curveObject);
+// //scene.add(curveObject);
+// Instantiate a loader
+const loader = new GLTFLoader();
 
+// Load a glTF resource
+loader.load(
+    // resource URL
+    "/public/1.glb",
+    // called when the resource is loaded
+    function (gltf) {
+        console.log(gltf, "1111");
+        gltf.scene.traverse(function (object3d) {
+            console.log(object3d, "222);");
+            if (object3d.name.includes("锤把")) {
+                object3d.material = new THREE.MeshBasicMaterial({ color: 0x7df9ff });
+            }
+            if (object3d.name.includes("锤把") || object3d.name.includes("锤头")) {
+                object3d.castShadow = true;
+            }
+            if (object3d.name.includes("平面")) {
+                object3d.receiveShadow = true;
+            }
+        });
+        scene.add(gltf.scene);
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+    }
+);
+//环境光
+const ambientLight = new THREE.AmbientLight(0x404040, 1);
+scene.add(ambientLight);
+
+// 平行光
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+directionalLight2.position.set(1, 1, 1);
+// scene.add(directionalLight2);
+//点光源
+const pointLight = new THREE.PointLight(0xffffff, 10000, 100);
+pointLight.position.set(15, 20, 10);
+pointLight.castShadow = true;
+scene.add(pointLight);
+//点光源辅助
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 2);
+scene.add(pointLightHelper);
 onMounted(() => {
     //创建渲染器
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-
+    renderer.shadowMap.enabled = true;
     document.getElementById("main").appendChild(renderer.domElement);
 
     //允许用户使用鼠标来旋转、缩放和移动视角，以便更好地查看 3D 场景。轨道控制器
@@ -124,7 +170,7 @@ onMounted(() => {
     //坐标轴
     const axesHelper = new THREE.AxesHelper(10);
     axesHelper.position.y = 0;
-    // scene.add(axesHelper);
+    scene.add(axesHelper);
     // setInterval(() => {
     //     // if (points.position.z > resetPositionZ) {
     //     points.position.z = -50;
